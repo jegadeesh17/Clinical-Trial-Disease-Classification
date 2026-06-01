@@ -151,3 +151,11 @@ Thumbs.db
 # Project-specific large files
 clinical_trials.db
 data/clinical_trials_raw_patient2trial_conditions.csv
+# Logs
+logs-*.txt
+
+# Documents
+*.docx
+*.pdf
+*.doc
+*.wpf
