@@ -155,7 +155,6 @@ data/clinical_trials_raw_patient2trial_conditions.csv
 logs-*.txt
 
 # Documents
-*.docx
 *.pdf
 *.doc
 *.wpf

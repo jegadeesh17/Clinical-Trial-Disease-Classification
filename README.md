@@ -9,24 +9,22 @@ This project implements a complete NLP pipeline to classify clinical trials into
 
 ## 🏗️ Architecture & Pipeline
 
-1. **Relational Database Design**: Models database schemas using SQLAlchemy to store and query over 60,000 clinical trial records.
-2. **Medical Text Preprocessing Pipeline**: A fast, custom NLP pipeline using NLTK to:
-   - Lowercase texts and strip HTML tags
-   - Remove punctuation and numbers
-   - Filter out English stopwords
-   - Lemmatize tokens to their dictionary root forms
-3. **TF-IDF Feature Engineering**: Constructs a high-dimensional text feature matrix using a TfidfVectorizer configured with unigrams, bigrams, sublinear term frequency scaling, and a vocabulary limit of 15,000 features.
-4. **Balanced Classification & Explainability**: Uses Logistic Regression optimized with balanced class weighting to handle imbalanced therapeutic labels. Explains predictions via an Explainable AI (XAI) dashboard showing the top predictive keywords.
+1. **Data Ingestion & Database Setup**: An ETL pipeline to ingest raw CSV data into a central SQLite database managed with SQLAlchemy, storing over 60,000 clinical trial records.
+2. **Medical Text Preprocessing**: A custom NLTK NLP pipeline to clean, tokenize, remove stopwords, and lemmatize raw medical text.
+3. **Machine Learning & Feature Engineering**: A classification pipeline extracting TF-IDF features (unigrams/bigrams, sublinear scaling, 15,000 max features) and training a class-weighted Logistic Regression model to handle label imbalance.
+4. **Interactive Dashboard**: A Streamlit web application providing a clean UI to classify text inputs and explain predictions in real-time using Explainable AI (XAI) keyword visualizations.
 
 ## 🚀 How to Run
 
-1. **Verify Database**: Ensure the SQLite database `clinical_trials.db` exists in the project root.
+1. **Download Raw Dataset**: Download the raw dataset `clinical_trials_raw_patient2trial_conditions.csv` from [Google Drive](https://drive.google.com/file/d/1NJ1JzOR2SLQhFWsPY5L8AMDXFLrQmrK2/view?usp=sharing) and place it inside the `data/` directory.
 2. **Execute Ingestion & Training**:
+   Run the ETL pipeline to ingest the data and train the classifier:
    ```bash
    python -m src.pipeline
    python -m src.train
    ```
 3. **Run the Streamlit Dashboard**:
+   Start the local Streamlit server to open the interactive classification dashboard:
    ```bash
    python -m streamlit run app.py
    ```
