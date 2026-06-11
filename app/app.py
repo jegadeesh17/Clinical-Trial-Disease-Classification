@@ -10,7 +10,7 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 # Add the project root to path for imports
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.database import SessionLocal, ClinicalTrial, PredictionLog, engine
 from src.pipeline import run_etl, clean_text_fast
@@ -249,9 +249,7 @@ with st.sidebar:
     else:
         st.error("ML Model: Inactive (Needs Training)")
         
-    st.markdown("---")
-    st.markdown("### Project Mentorship")
-    st.info("College Project Submission: Clinical Trial Disease Category Classification System using NLP, SQLAlchemy & Streamlit.")
+
     
     st.markdown("<div style='font-size: 0.8rem; color: #64748b; margin-top: 50px;'>Antigravity Developer Assistant • v1.0.0</div>", unsafe_allow_html=True)
 
@@ -557,7 +555,7 @@ with tab_explore:
         st.info("Database is empty. Please run ingestion pipeline.")
     else:
         st.markdown("<h3 style='margin-bottom:10px;'>Browse and Search Clinical Trials</h3>", unsafe_allow_html=True)
-        st.markdown("Search across 60,337 entries in the SQLite database by keyword or filter by study parameters.", unsafe_allow_html=True)
+        st.markdown("Search across 60,337 entries in the PostgreSQL database by keyword or filter by study parameters.", unsafe_allow_html=True)
         
         # Filters row
         fil_col1, fil_col2, fil_col3 = st.columns([2, 1, 1])
@@ -738,7 +736,7 @@ with tab_system:
     
     with op_col1:
         st.markdown("#### Database Details")
-        st.write(f"**Database URI:** `sqlite:///clinical_trials.db` (configured locally)")
+        st.write(f"**Database URI:** `PostgreSQL Database` (configured locally)")
         st.write(f"**Clinical Trials Count:** {db_stats['total_trials']:,} records")
         st.write(f"**Logged User Predictions:** {db_stats['total_logs']:,} logs")
         

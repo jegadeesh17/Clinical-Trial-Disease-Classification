@@ -1,17 +1,23 @@
 import os
+import urllib.parse
 from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Text, Float, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
+from dotenv import load_dotenv
 
-# Default database is SQLite. If PostgreSQL is needed, set the DATABASE_URL environment variable.
-# Example: DATABASE_URL=postgresql://username:password@localhost:5432/clinical_trials_db
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///clinical_trials.db")
+# Load environment variables from .env
+load_dotenv()
 
-engine = create_engine(
-    DATABASE_URL, 
-    # SQLite-specific arguments (ignored by other databases)
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-)
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "clinical_trials_db")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres@1706")
+
+encoded_password = urllib.parse.quote_plus(DB_PASSWORD)
+DATABASE_URL = f"postgresql://{DB_USER}:{encoded_password}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

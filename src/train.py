@@ -3,7 +3,7 @@ import sys
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -50,7 +50,6 @@ def train_model():
         print(f"Training set size: {len(X_train)} | Test set size: {len(X_test)}")
         
         # Define the ML Pipeline: TF-IDF Vectorizer + Logistic Regression Classifier
-        # Logistic Regression works exceptionally well for high-dimensional TF-IDF vectors
         pipeline = Pipeline([
             ('tfidf', TfidfVectorizer(
                 max_features=15000, 
@@ -59,26 +58,35 @@ def train_model():
             )),
             ('clf', LogisticRegression(
                 max_iter=1000, 
-                C=1.5, 
                 class_weight='balanced', 
                 random_state=42
             ))
         ])
         
-        print("Training model (TF-IDF + Logistic Regression)...")
-        pipeline.fit(X_train, y_train)
-        print("Model training complete!")
+        # Defining parameter grid for GridSearchCV
+        param_grid = {
+            'clf__C': [0.1, 1.0, 1.5, 2.0]
+        }
         
-        # Evaluate model performance
-        print("Evaluating model performance on test set...")
-        y_pred = pipeline.predict(X_test)
+        print("Starting Grid Search...")
+        grid_search = GridSearchCV(pipeline, param_grid, cv=3, scoring='accuracy', n_jobs=-1)
+        grid_search.fit(X_train, y_train)
+
+        print(f"Best Parameters: {grid_search.best_params_}")
+        print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.4f}")
+
+        # Re-evaluate with best estimator
+        best_pipeline = grid_search.best_estimator_
+        
+        print("Evaluating best model performance on test set...")
+        y_pred = best_pipeline.predict(X_test)
         
         accuracy = accuracy_score(y_test, y_pred)
         report_dict = classification_report(y_test, y_pred, output_dict=True)
         report_str = classification_report(y_test, y_pred)
         cm = confusion_matrix(y_test, y_pred)
         
-        print(f"\nModel Accuracy: {accuracy:.4f}")
+        print(f"\nTuned Model Accuracy on Test Set: {accuracy:.4f}")
         print("\nClassification Report:\n", report_str)
         
         # Ensure models directory exists
@@ -87,8 +95,8 @@ def train_model():
         
         # Extract features and model coefficients for Explainable AI tab in Streamlit
         print("Extracting top predictive words for each disease category...")
-        vectorizer = pipeline.named_steps['tfidf']
-        classifier = pipeline.named_steps['clf']
+        vectorizer = best_pipeline.named_steps['tfidf']
+        classifier = best_pipeline.named_steps['clf']
         feature_names = vectorizer.get_feature_names_out()
         classes = classifier.classes_
         
@@ -121,8 +129,8 @@ def train_model():
         model_path = os.path.join(models_dir, "classifier_pipeline.joblib")
         metrics_path = os.path.join(models_dir, "training_metrics.joblib")
         
-        print(f"Saving model pipeline to: {model_path}")
-        joblib.dump(pipeline, model_path)
+        print(f"Saving best model pipeline to: {model_path}")
+        joblib.dump(best_pipeline, model_path)
         
         print(f"Saving training metrics to: {metrics_path}")
         joblib.dump(metrics, metrics_path)

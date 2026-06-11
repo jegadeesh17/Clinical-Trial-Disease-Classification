@@ -124,7 +124,7 @@ def run_etl(csv_path=None, force=False):
             db_session.execute(text("DELETE FROM clinical_trials"))
             db_session.commit()
             
-        print("Bulk uploading dataset into SQLite database. Writing rows...")
+        print("Bulk uploading dataset into PostgreSQL database. Writing rows...")
         # Write directly to SQL using pandas optimized engine interface
         df_db.to_sql(
             name='clinical_trials', 
