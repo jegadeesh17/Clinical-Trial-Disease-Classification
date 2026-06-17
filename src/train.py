@@ -3,9 +3,11 @@ import sys
 import joblib
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from src.database import SessionLocal, ClinicalTrial
@@ -49,44 +51,45 @@ def train_model():
         
         print(f"Training set size: {len(X_train)} | Test set size: {len(X_test)}")
         
-        # Define the ML Pipeline: TF-IDF Vectorizer + Logistic Regression Classifier
-        pipeline = Pipeline([
-            ('tfidf', TfidfVectorizer(
-                max_features=15000, 
-                ngram_range=(1, 2), 
-                sublinear_tf=True
-            )),
-            ('clf', LogisticRegression(
-                max_iter=1000, 
-                class_weight='balanced', 
-                random_state=42
-            ))
-        ])
+        tfidf = TfidfVectorizer(max_features=15000, ngram_range=(1, 2), sublinear_tf=True)
         
-        # Defining parameter grid for GridSearchCV
-        param_grid = {
-            'clf__C': [0.1, 1.0, 1.5, 2.0]
+        # Define models to compare
+        models = {
+            "Logistic Regression": LogisticRegression(max_iter=1000, class_weight='balanced', random_state=42),
+            "Multinomial Naive Bayes": MultinomialNB(),
+            "Random Forest": RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42, n_jobs=-1)
         }
         
-        print("Starting Grid Search...")
-        grid_search = GridSearchCV(pipeline, param_grid, cv=3, scoring='accuracy', n_jobs=-1)
-        grid_search.fit(X_train, y_train)
-
-        print(f"Best Parameters: {grid_search.best_params_}")
-        print(f"Best Cross-Validation Accuracy: {grid_search.best_score_:.4f}")
-
-        # Re-evaluate with best estimator
-        best_pipeline = grid_search.best_estimator_
+        best_model_name = None
+        best_accuracy = 0
+        best_pipeline = None
         
+        print("Starting model training and comparison...")
+        for name, clf in models.items():
+            print(f"Training {name}...")
+            pipeline = Pipeline([('tfidf', tfidf), ('clf', clf)])
+            pipeline.fit(X_train, y_train)
+            
+            y_pred = pipeline.predict(X_test)
+            acc = accuracy_score(y_test, y_pred)
+            
+            print(f"{name} Accuracy: {acc:.4f}")
+            if acc > best_accuracy:
+                best_accuracy = acc
+                best_model_name = name
+                best_pipeline = pipeline
+
+        print(f"\nBest Model Found: {best_model_name} (Accuracy: {best_accuracy:.4f})")
+        
+        # Re-evaluate with best estimator
         print("Evaluating best model performance on test set...")
         y_pred = best_pipeline.predict(X_test)
         
         accuracy = accuracy_score(y_test, y_pred)
-        report_dict = classification_report(y_test, y_pred, output_dict=True)
-        report_str = classification_report(y_test, y_pred)
+        report_dict = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+        report_str = classification_report(y_test, y_pred, zero_division=0)
         cm = confusion_matrix(y_test, y_pred)
         
-        print(f"\nTuned Model Accuracy on Test Set: {accuracy:.4f}")
         print("\nClassification Report:\n", report_str)
         
         # Ensure models directory exists
@@ -102,16 +105,24 @@ def train_model():
         
         top_words_per_class = {}
         for idx, class_name in enumerate(classes):
-            # Coefficients corresponding to this class label
-            # If binary classification, coef_ has shape (1, n_features)
-            if len(classes) == 2:
-                coefs = classifier.coef_[0] if idx == 1 else -classifier.coef_[0]
-            else:
-                coefs = classifier.coef_[idx]
+            top_words = []
+            if hasattr(classifier, 'coef_'):
+                if len(classes) == 2:
+                    coefs = classifier.coef_[0] if idx == 1 else -classifier.coef_[0]
+                else:
+                    coefs = classifier.coef_[idx]
+                top_coef_indices = np.argsort(coefs)[-20:][::-1]
+                top_words = [(feature_names[i], float(coefs[i])) for i in top_coef_indices]
+            elif hasattr(classifier, 'feature_log_prob_'):
+                coefs = classifier.feature_log_prob_[idx]
+                top_coef_indices = np.argsort(coefs)[-20:][::-1]
+                top_words = [(feature_names[i], float(coefs[i])) for i in top_coef_indices]
+            elif hasattr(classifier, 'feature_importances_'):
+                # Random Forest has general feature importances, not per-class
+                coefs = classifier.feature_importances_
+                top_coef_indices = np.argsort(coefs)[-20:][::-1]
+                top_words = [(feature_names[i], float(coefs[i])) for i in top_coef_indices]
                 
-            # Get index of top coefficients
-            top_coef_indices = np.argsort(coefs)[-20:][::-1]
-            top_words = [(feature_names[i], float(coefs[i])) for i in top_coef_indices]
             top_words_per_class[class_name] = top_words
             
         # Structure the training metadata metrics dictionary
