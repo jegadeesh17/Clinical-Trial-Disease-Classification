@@ -53,22 +53,16 @@ This project implements a complete end-to-end NLP and relational analytics platf
 ### **Project Structure**
 
 ```bash
-Clinical-Trial-Disease-Classification/
+ClinicalTrialClassification/
 │
-├── data/                               # Raw and processed clinical trial datasets
-│
-├── models/                             # Saved trained TF-IDF vectorizer and classifier
-│
-├── app.py                              # Streamlit classification dashboard
-│
-├── src/
-│   ├── __init__.py                     # Package initialization
-│   ├── database.py                     # SQLite database connection and schema
-│   ├── pipeline.py                     # ETL ingestion pipeline (CSV → SQLite)
-│   └── train.py                        # NLP preprocessing, TF-IDF, model training
-│
-├── project_presentation.ipynb         # Project summary notebook
-├── requirements.txt                   # Python dependencies
+├── app/                          # Streamlit application files
+│   └── app.py                    # Main Streamlit dashboard
+├── data/                         # Project datasets
+├── docs/                         # Documentation and visualizations
+├── models/                       # Saved trained models
+├── notebooks/                    # Jupyter notebooks (Source of Truth)
+├── src/                          # Core Python logic and scripts
+├── requirements.txt              # Python dependencies
 └── README.md
 ```
 
@@ -142,7 +136,7 @@ The project features an interactive **Streamlit Web Application** that accepts f
 
 #### **To Launch the Platform Locally:**
 ```powershell
-python -m streamlit run app.py
+streamlit run app/app.py
 ```
 
 ---
@@ -169,7 +163,7 @@ python -m streamlit run app.py
 ```bash
 git clone https://github.com/jegadeesh17/Clinical-Trial-Disease-Classification.git
 
-cd Clinical-Trial-Disease-Classification
+cd ClinicalTrialClassification
 ```
 
 ---
