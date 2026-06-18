@@ -235,7 +235,7 @@ with st.sidebar:
     else:
         st.error("ML Model: Offline")
         
-    st.markdown("<div style='font-size: 0.8rem; color: #94a3b8; margin-top: 50px;'>Antigravity Developer Assistant • v1.1.0</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size: 0.8rem; color: #94a3b8; margin-top: 50px;'>Clinical Trial Intelligence Assistant • v1.0.0</div>", unsafe_allow_html=True)
 
 
 # --- MAIN HEADER ---
@@ -327,7 +327,7 @@ with tab_insights:
                 coloraxis_showscale=False
             )
             fig_bar.update_yaxes(categoryorder='total ascending', automargin=True)
-            st.plotly_chart(fig_bar, use_container_width=True, theme=None)
+            st.plotly_chart(fig_bar, width="stretch", theme=None)
             
         with chart_col2:
             st.markdown("<h3 style='margin-bottom:15px; color:#0f172a;'>Trial Phases Distribution</h3>", unsafe_allow_html=True)
@@ -350,7 +350,7 @@ with tab_insights:
                 margin=dict(l=10, r=10, t=10, b=10),
                 legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
             )
-            st.plotly_chart(fig_pie, use_container_width=True, theme=None)
+            st.plotly_chart(fig_pie, width="stretch", theme=None)
             
         # Row 3: Word Cloud by Category
         st.markdown("<hr style='border-color: rgba(0,0,0,0.08); margin: 30px 0;'>", unsafe_allow_html=True)
@@ -417,7 +417,7 @@ with tab_performance:
                 'f1-score': 'F1-Score',
                 'support': 'Support (Trials)'
             })
-            st.dataframe(report_classes_df, use_container_width=True)
+            st.dataframe(report_classes_df, width="stretch")
             
         with col_m2:
             st.markdown("#### Global Summary")
@@ -455,7 +455,7 @@ with tab_performance:
             font_color='#0f172a',
             margin=dict(l=0, r=0, t=10, b=0)
         )
-        st.plotly_chart(fig_cm, use_container_width=True, theme=None)
+        st.plotly_chart(fig_cm, width="stretch", theme=None)
         
         # Section 3: Explainable AI - Coefficients
         st.markdown("<hr style='border-color: rgba(0,0,0,0.08); margin: 25px 0;'>", unsafe_allow_html=True)
@@ -486,7 +486,7 @@ with tab_performance:
                 height=400
             )
             fig_coef.update_yaxes(automargin=True)
-            st.plotly_chart(fig_coef, use_container_width=True, theme=None)
+            st.plotly_chart(fig_coef, width="stretch", theme=None)
 
 
 # ==========================================
@@ -587,7 +587,7 @@ with tab_classifier:
                             height=250
                         )
                         fig_probs.update_yaxes(automargin=True)
-                        st.plotly_chart(fig_probs, use_container_width=True, theme=None)
+                        st.plotly_chart(fig_probs, width="stretch", theme=None)
                         
         if 'last_log_id' in st.session_state:
             st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
