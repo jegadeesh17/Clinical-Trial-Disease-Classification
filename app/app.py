@@ -352,6 +352,17 @@ with tab_insights:
             )
             st.plotly_chart(fig_pie, width="stretch", theme=None)
             
+        # Phase Descriptions
+        with st.expander("ℹ️ What do these trial phases mean?"):
+            st.markdown("""
+            * **Phase 1:** Tests safety, side effects, and best dosage on a small group of volunteers.
+            * **Phase 2:** Tests efficacy and further evaluates safety on a larger group of patients with the condition.
+            * **Phase 3:** Compares the new treatment to standard treatments on large groups to confirm effectiveness.
+            * **Phase 4:** Post-market surveillance gathering information on long-term effects after approval.
+            * **Early Phase 1:** Exploratory, first-in-human trials before Phase 1.
+            * **Not Applicable:** Often used for observational studies or trials not testing a specific new drug.
+            """)
+            
         # Row 3: Word Cloud by Category
         st.markdown("<hr style='border-color: rgba(0,0,0,0.08); margin: 30px 0;'>", unsafe_allow_html=True)
         st.markdown("<h3 style='margin-bottom:15px; color:#0f172a;'>Frequently Occurring Medical Terms</h3>", unsafe_allow_html=True)
