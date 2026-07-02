@@ -12,7 +12,7 @@ This project implements a complete end-to-end NLP and relational analytics platf
 
 ### **Key Features**
 
-* **Large-Scale ETL Pipeline:** Ingests 60,000+ clinical trial records from raw CSV into a central SQLite database via SQLAlchemy.
+* **Large-Scale ETL Pipeline:** Ingests 60,000+ clinical trial records from raw CSV into a central PostgreSQL database via SQLAlchemy.
 * **Medical Text NLP Pipeline:** Custom NLTK-based tokenization, stopword removal, and lemmatization tailored for medical language.
 * **TF-IDF Feature Extraction:** Unigram/bigram TF-IDF with sublinear scaling and 15,000 max features for rich text representation.
 * **Class-Weighted Classification:** Logistic Regression with class-weight balancing to handle severe label imbalance.
@@ -73,14 +73,16 @@ ClinicalTrialClassification/
 ### **1. Data Ingestion & Database Setup**
 
 * Reads raw CSV with 60,000+ clinical trial records
-* Ingests into a central SQLite database using SQLAlchemy
+* Ingests into a central PostgreSQL database using SQLAlchemy
 * Establishes indexed schema for fast query access
 
 ```python
 from sqlalchemy import create_engine
+import os
 
-engine = create_engine("sqlite:///clinical_trials.db")
-df.to_sql("trials", engine, if_exists="replace", index=False)
+db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@localhost:5432/clinical_trials_db"
+engine = create_engine(db_url)
+df.to_sql("clinical_trials", engine, if_exists="append", index=False)
 ```
 
 ---
@@ -128,6 +130,29 @@ clf.fit(X_train, y_train)
 | Class Handling      | Balanced weighting |
 | Model               | Logistic Regression|
 
+#### **Verified Metrics (from notebook run artifacts)**
+- Base Logistic Regression test accuracy: **0.9481**
+- Tuned Logistic Regression test accuracy: **0.9495**
+- Weighted F1 (base run): **0.9485**
+
+These values come from the committed notebook output cells and are surfaced in the app when `models/training_metrics.joblib` is available.
+
+#### **Reproducibility**
+Training exports:
+- `models/classifier_pipeline.joblib`
+- `models/training_metrics.joblib`
+
+Re-run training to regenerate metrics and artifacts:
+```bash
+python -m src.pipeline
+python -m src.train
+```
+
+#### **Explainability**
+- The app reads per-class diagnostics from `training_metrics.joblib`.
+- Prediction UI shows confidence distribution and top keyword signals that influenced class prediction.
+- This improves interpretability for non-technical reviewers (clinical operations teams).
+
 ---
 
 ### **Interactive Application Deployment**
@@ -139,6 +164,22 @@ The project features an interactive **Streamlit Web Application** that accepts f
 streamlit run app/app.py
 ```
 
+#### **3-Command Quickstart**
+```bash
+pip install -r requirements.txt
+python -m src.pipeline && python -m src.train
+streamlit run app/app.py
+```
+
+#### **Sample Input / Output**
+- Input summary: "Randomized trial evaluating metformin plus lifestyle intervention in adults with uncontrolled type 2 diabetes."
+- Typical prediction output: `Type 2 Diabetes` with confidence distribution and top keyword explanation.
+
+#### **Metrics + Limitations Block**
+- Verified tuned test accuracy: **0.9495**
+- Strength: interpretable TF-IDF + Logistic Regression workflow
+- Limitation: benchmark is based on provided dataset split and may shift on external clinical text distributions
+
 ---
 
 ### **Technology Stack**
@@ -148,7 +189,7 @@ streamlit run app/app.py
 | Programming          | Python                         |
 | NLP                  | NLTK, TF-IDF (Scikit-learn)    |
 | Machine Learning     | Scikit-learn (Logistic Regression) |
-| Database             | SQLite, SQLAlchemy             |
+| Database             | PostgreSQL, SQLAlchemy         |
 | Data Processing      | Pandas, NumPy                  |
 | Explainability       | Custom XAI keyword visualization|
 | Notebook Environment | Jupyter Notebook               |
@@ -223,9 +264,15 @@ A pharmaceutical research organization or clinical registry can use this platfor
 
 ---
 
+### **Model Choice Trade-off**
+- Logistic Regression was selected over alternatives because it delivered the best validation accuracy while preserving interpretability and faster training/inference.
+- Transformer models (BioBERT/ClinicalBERT) are intentionally deferred to a future phase due to higher compute cost and deployment complexity for this project scope.
+
+---
+
 ### **Contributors**
 
-* **Jegadeesh D** — Medical NLP pipeline, TF-IDF feature engineering, Logistic Regression classification, SQLite ETL, explainable AI, and Streamlit dashboard development
+* **Jegadeesh D** — Medical NLP pipeline, TF-IDF feature engineering, Logistic Regression classification, PostgreSQL ETL, explainable AI, and Streamlit dashboard development
 
 ---
 

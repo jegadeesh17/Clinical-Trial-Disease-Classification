@@ -84,7 +84,8 @@ def run_etl(csv_path=None, force=False):
         
         # If path is not provided, look in default location
         if csv_path is None:
-            csv_path = r"c:\Users\jegad\projects\Clinical Trial Disease Classification\data\clinical_trials_raw_patient2trial_conditions.csv"
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            csv_path = os.path.join(project_root, "data", "clinical_trials_raw_patient2trial_conditions.csv")
             
         if not os.path.exists(csv_path):
             raise FileNotFoundError(f"Source CSV file not found at: {csv_path}")
