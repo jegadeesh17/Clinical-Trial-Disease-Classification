@@ -33,7 +33,7 @@ except Exception:
 lemmatizer = WordNetLemmatizer()
 
 # Clean text function with optimizations for large datasets
-def clean_text_fast(text_data):
+def clean_text_fast(text_data: str) -> str:
     """
     Cleans and preprocesses medical text:
     - Convers to lowercase
@@ -66,7 +66,7 @@ def clean_text_fast(text_data):
     return " ".join(cleaned_words)
 
 
-def run_etl(csv_path=None, force=False):
+def run_etl(csv_path: str = None, force: bool = False) -> bool:
     """
     Extracts data from the CSV, transforms it by preprocessing the text, 
     and loads it in bulk into the SQLite database.

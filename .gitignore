@@ -159,3 +159,8 @@ logs-*.txt
 *.doc
 *.wpf
 *.docx
+
+# DVC and Model artifacts
+.dvc/
+*.pth
+*.joblib
