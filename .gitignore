@@ -163,4 +163,5 @@ logs-*.txt
 # DVC and Model artifacts
 .dvc/
 *.pth
-*.joblib
+models/classifier_pipeline_best.joblib
+notebooks/models/
