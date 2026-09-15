@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  clinical-trial-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinical-trial-classifier-api
+    restart: unless-stopped
+    ports:
+      - "8005:8005"
+    environment:
+      - PORT=8005

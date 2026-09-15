@@ -5,7 +5,6 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sqlalchemy import text
-from src.database import engine, SessionLocal, ClinicalTrial, init_db
 
 # Programmatic NLTK download helper to prevent missing resource errors
 def setup_nltk():
@@ -71,6 +70,7 @@ def run_etl(csv_path: str = None, force: bool = False) -> bool:
     Extracts data from the CSV, transforms it by preprocessing the text, 
     and loads it in bulk into the SQLite database.
     """
+    from src.database import engine, SessionLocal, ClinicalTrial, init_db
     # Create tables if they do not exist
     init_db()
     
