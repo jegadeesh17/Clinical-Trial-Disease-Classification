@@ -13,7 +13,7 @@ This project implements a complete end-to-end NLP and relational analytics platf
 ### **Key Features**
 
 * **Large-Scale ETL Pipeline:** Ingests 60,000+ clinical trial records from raw CSV into a central PostgreSQL database via SQLAlchemy.
-* **Medical Text NLP Pipeline:** Custom NLTK-based tokenization, stopword removal, and lemmatization tailored for medical language.
+* **Medical Text NLP Pipeline:** Regex cleaning, whitespace tokenization, NLTK stopword removal and WordNet lemmatization (English stopword list; no medical lexicon).
 * **TF-IDF Feature Extraction:** Unigram/bigram TF-IDF with sublinear scaling and 15,000 max features for rich text representation.
 * **Class-Weighted Classification:** Logistic Regression with class-weight balancing to handle severe label imbalance.
 * **8-Class Disease Taxonomy:** Classifies trials into Covid-19, Breast Cancer, Type 2 Diabetes, and 5 other therapeutic areas.
@@ -32,14 +32,14 @@ This project implements a complete end-to-end NLP and relational analytics platf
 
 #### **Disease Categories (8 Classes)**
 
-* Covid-19
+* Anxiety
 * Breast Cancer
+* Chronic Obstructive Pulmonary Disease
+* Covid-19
+* Glaucoma
+* Rheumatoid Arthritis
+* Sickle Cell Anemia
 * Type 2 Diabetes
-* Cardiovascular Disease
-* Mental Health / Depression
-* Alzheimer's / Dementia
-* Cancer (General)
-* Rare Diseases
 
 #### **Key Fields**
 
@@ -239,7 +239,7 @@ python -m src.train
 ### **5. Launch Dashboard**
 
 ```bash
-python -m streamlit run app.py
+python -m streamlit run app/app.py
 ```
 
 ---
@@ -265,7 +265,7 @@ A pharmaceutical research organization or clinical registry can use this platfor
 ---
 
 ### **Model Choice Trade-off**
-- Logistic Regression was selected over alternatives because it delivered the best validation accuracy while preserving interpretability and faster training/inference.
+- Logistic Regression was selected over alternatives because it delivered the best held-out test accuracy while preserving interpretability and faster training/inference.
 - Transformer models (BioBERT/ClinicalBERT) are intentionally deferred to a future phase due to higher compute cost and deployment complexity for this project scope.
 
 ---
